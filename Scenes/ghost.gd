@@ -7,9 +7,6 @@ enum GhostType  { BLINKY, PINKY, INKY, CLYDE }
 signal direction_change(current_direction: String)
 signal run_away_timeout
 
-
-
-
 # ===== Config / references =====
 @export var ghost_type: GhostType = GhostType.BLINKY
 @export var player: Player
@@ -62,7 +59,6 @@ var _lane_sign := 1.0                           # +1 / -1 per ghost
 @onready var run_away_timer: Timer = $RunAwayTimer
 @onready var points_label: Label = $PointsLabel
 
-
 # state
 var current_scatter_index: int = 0
 var current_at_home_index: int = 0
@@ -87,8 +83,6 @@ const STUCK_TIMEOUT := 0.75
 # collision cooldown (fix for "ghosts stop / don't eat later")
 var _player_collision_cooldown: Timer
 const PLAYER_LAYER_INDEX := 1
-
-
 
 func _ready() -> void:
 	add_to_group("Ghost")  # for anti-bunching queries
@@ -152,15 +146,7 @@ func _ready() -> void:
 	if is_starting_at_home and at_home_timer.time_left == 0.0 and !release_on_first_input:
 		_on_player_started_moving()
 
-func _nudge_replan() -> void:
-	# Sem caminho ou praticamente sem movimento? Replaneia um alvo.
-	var no_path := navigation_agent_2d.get_current_navigation_path().is_empty()
-	var barely_moved := (global_position - _last_pos).length() < 1.0
-	if no_path or barely_moved:
-		_replan_target()
-		
 func _process(delta: float) -> void:
-	_ensure_nav_map_bound()
 	if !run_away_timer.is_stopped() and run_away_timer.time_left < run_away_timer.wait_time * 0.5 and !is_blinking:
 		start_blinking()
 
@@ -215,20 +201,6 @@ func _replan_target() -> void:
 				navigation_agent_2d.target_position = at_home_nodes[0].position
 		GhostState.STARTING_AT_HOME:
 			move_to_next_home_position()
-			
-func _ensure_nav_map_bound() -> void:
-	if tile_map == null:
-		return
-	var current_map := tile_map.get_navigation_map(0)
-	if current_map == RID():
-		return
-	var agent_map := NavigationServer2D.agent_get_map(navigation_agent_2d.get_rid())
-	if agent_map != current_map:
-		# rebind to the fresh map + kick a replan
-		navigation_agent_2d.set_navigation_map(current_map)
-		NavigationServer2D.agent_set_map(navigation_agent_2d.get_rid(), current_map)
-		_replan_target()
-		
 
 func setup() -> void:
 	_resolve_target_paths()
@@ -243,7 +215,6 @@ func setup() -> void:
 	NavigationServer2D.agent_set_map(navigation_agent_2d.get_rid(), tile_map.get_navigation_map(0))
 	eyes_sprite.show_eyes()
 	body_sprite.move()
-	_ensure_nav_map_bound()
 
 	if is_starting_at_home:
 		start_at_home()
@@ -575,4 +546,3 @@ func _on_body_entered(body: Node) -> void:
 			pl.die()
 		scatter_timer.wait_time = 600.0
 		_enter_scatter_mode()
-		_replan_target()

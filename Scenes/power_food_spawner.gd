@@ -14,8 +14,8 @@ class_name PowerFoodSpawner
 @export var min_distance_between_fruits: float = 64.0
 @export var allowed_fruits: Array[String] = [
 	"fruit_apple",
-	"fruit_Orange",
-	"fruit_Melon"
+	"fruit_orange",
+	"fruit_melon"
 ]
 @export var fruit_scale: float = 1.5
 

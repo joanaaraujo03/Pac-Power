@@ -243,7 +243,7 @@ func set_lifes(lifes: int) -> void:
 	if lifes == 0:
 		game_lost()
 
-func set_score(score: int) -> void: 
+func set_score(score: int) -> void:
 	game_score_label.text = "SCORE: %d" % score
 
 func game_lost() -> void:
@@ -256,7 +256,7 @@ func game_won() -> void:
 	game_label.text = "Game won"
 	center_container.show()
 	clear_all_power_timers()
-	get_tree().paused = true 
+	get_tree().paused = true
 
 # ======= Countdown label =======
 func _create_power_countdown_label() -> void:
